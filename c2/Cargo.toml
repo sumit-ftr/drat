@@ -1,0 +1,7 @@
+[package]
+name = "c2"
+version = "0.1.0"
+edition = "2021"
+authors = ["Sumit Modak <sumit.modak.code@gmail.com>"]
+
+[dependencies]
