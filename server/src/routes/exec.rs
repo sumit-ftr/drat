@@ -30,7 +30,7 @@ pub async fn exec_cmd<'a>(
                 String::from_utf8(op.stdout).unwrap(),
                 String::from_utf8(op.stderr).unwrap()
             ),
-            Err(_) => String::from("command not found"),
+            Err(_) => String::from("Error: Command not found"),
         }
     };
 
