@@ -33,7 +33,7 @@ pub async fn exec_cmd<'a>(
                 .current_dir(&ext.lock().unwrap().pwd)
                 .spawn()
                 .unwrap();
-            writeln!(child.stdin.as_mut().unwrap(), "{}", "PASSWORD").unwrap();
+            writeln!(child.stdin.as_mut().unwrap(), "{}", "").unwrap();
             child.wait_with_output()
         } else {
             std::process::Command::new(cmd_bin_name)
