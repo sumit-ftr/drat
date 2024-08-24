@@ -1138,6 +1138,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "rat"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tokio-util",
+ "xcap",
+]
+
+[[package]]
 name = "rav1e"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1309,18 +1321,6 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "server"
-version = "0.1.0"
-dependencies = [
- "axum",
- "serde",
- "serde_json",
- "tokio",
- "tokio-util",
- "xcap",
 ]
 
 [[package]]
