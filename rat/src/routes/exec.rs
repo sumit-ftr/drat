@@ -12,7 +12,7 @@ pub struct C2Payload {
     cmd: String,
 }
 
-pub async fn exec_cmd<'a>(
+pub async fn exec_cmd(
     Extension(ext): Extension<Arc<Mutex<ShellState>>>,
     Json(body): Json<C2Payload>,
 ) -> Html<String> {

