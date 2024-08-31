@@ -3,6 +3,8 @@ name = "rat"
 version = "0.1.0"
 edition = "2021"
 authors = ["Sumit Modak <sumit.modak.code@gmail.com>"]
+description = "API for remotely accessing user data"
+licence = "MIT"
 
 [dependencies]
 axum = { version = "0.7.5", features = ["macros"] }
@@ -10,5 +12,4 @@ serde = { version = "1.0.208", features = ["derive"] }
 serde_json = "1.0.125"
 tokio = { version = "1.39.3", features = ["full"] }
 tokio-util = { version = "0.7.11", features = ["io"] }
-# tower-http = { version = "0.5.2", features = ["cors"] }
 xcap = "0.0.12"

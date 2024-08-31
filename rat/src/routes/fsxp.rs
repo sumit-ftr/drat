@@ -13,7 +13,7 @@ pub struct FilePath {
     pub path: PathBuf,
 }
 
-pub async fn post_file(Json(body): Json<FilePath>) -> impl IntoResponse {
+pub async fn scout_path(Json(body): Json<FilePath>) -> impl IntoResponse {
     // checking that given path is a file or not
     match tokio::fs::read_to_string(&body.path).await {
         Ok(file) => {
@@ -65,6 +65,7 @@ fn content_type_value(ext: &str) -> String {
     }
 }
 
+// this function will be moved to c2 probably
 async fn build_dir_html(mut it: tokio::fs::ReadDir) -> String {
     let mut file_buf = String::with_capacity(65565);
     let mut common_buf = String::with_capacity(65565);
