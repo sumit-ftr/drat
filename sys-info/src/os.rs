@@ -5,11 +5,8 @@ pub fn fetch_os_info() -> String {
     for line in file.lines() {
         let mut it = line.split('=');
         if let (Some(key), Some(mut val)) = (it.next(), it.next()) {
-            if val.starts_with('"') {
-                val = &val[1..];
-            }
-            if val.ends_with('"') {
-                val = &val[..val.len() - 1];
+            if val.starts_with('"') && val.ends_with('"') {
+                val = &val[1..val.len() - 1];
             }
 
             if key == "NAME" {

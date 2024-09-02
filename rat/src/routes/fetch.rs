@@ -9,6 +9,7 @@ pub async fn fetch_sys_info() -> String {
     response.push_str(&sys_info::fetch_disk_usage());
     response.push_str(&sys_info::fetch_memory());
     response.push_str(&sys_info::fetch_cpu());
+    response.push_str(&sys_info::fetch_resolution());
 
     response
 }

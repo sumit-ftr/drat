@@ -3,6 +3,7 @@ mod kernel;
 mod memory;
 mod os;
 mod prompt;
+mod resolution;
 mod shell;
 mod storage;
 mod uptime;
@@ -10,7 +11,6 @@ mod uptime;
 // remaining
 mod battery;
 mod gpu;
-mod resolution;
 
 pub use cpu::fetch_cpu;
 pub use gpu::fetch_gpu;
@@ -18,6 +18,7 @@ pub use kernel::fetch_kernel_info;
 pub use memory::fetch_memory;
 pub use os::fetch_os_info;
 pub use prompt::fetch_prompt;
+pub use resolution::fetch_resolution;
 pub use shell::fetch_shell_info;
 pub use storage::fetch_disk_usage;
 pub use uptime::fetch_uptime;
