@@ -27,18 +27,8 @@ pub fn fetch_memory() -> String {
 
     format!(
         "MemTotal: {}\nMemUsed: {}\nMemAvail: {}\n",
-        formatted_memory(mem_total),
-        formatted_memory(mem_used),
-        formatted_memory(mem_total - mem_used)
+        crate::formatted_memory(mem_total),
+        crate::formatted_memory(mem_used),
+        crate::formatted_memory(mem_total - mem_used)
     )
-}
-
-fn formatted_memory(kb: u64) -> String {
-    let total_bytes = 1000 * kb;
-
-    let (gib, rem_bytes) = (total_bytes / 1073741824, total_bytes % 1073741824);
-    let (mib, rem_bytes) = (rem_bytes / 1048576, rem_bytes % 1048576);
-    let (kib, bytes) = (rem_bytes / 1024, rem_bytes % 1024);
-
-    format!("{gib}G {mib}M {kib}K {bytes}B")
 }

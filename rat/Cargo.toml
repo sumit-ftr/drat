@@ -6,6 +6,9 @@ authors = ["Sumit Modak <sumit.modak.code@gmail.com>"]
 description = "API for remotely accessing user data"
 licence = "MIT"
 
+[lib]
+doctest = false
+
 [dependencies]
 sys-info = { path = "../sys-info" }
 axum = { version = "0.7.5", features = ["macros"] }
