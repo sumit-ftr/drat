@@ -18,9 +18,9 @@ pub use kernel::fetch_kernel_info;
 pub use memory::fetch_memory;
 pub use os::fetch_os_info;
 pub use prompt::fetch_prompt;
-pub use resolution::fetch_resolution;
-pub use shell::fetch_shell_info;
-pub use storage::fetch_disk_usage;
+pub use resolution::fetch_resolution; //
+pub use shell::fetch_shell_info; //
+pub use storage::fetch_disk_usage; //
 pub use uptime::fetch_uptime;
 
 pub(crate) fn formatted_memory(kb: u64) -> String {

@@ -35,17 +35,17 @@ pub fn fetch_cpu() -> String {
     }
 
     // fetching cpu cores
-    let lscpu = std::process::Command::new("lscpu").output().unwrap();
     let mut cores = 0u64;
-    for line in String::from_utf8(lscpu.stdout).unwrap().lines() {
-        let mut it = line.split(':');
-        if let (Some(key), Some(val)) = (it.next(), it.next()) {
-            if key == "CPU(s)" {
-                cores = val.trim().parse().unwrap();
-                break;
+    if let Ok(lscpu) = std::process::Command::new("lscpu").output() {
+        for line in String::from_utf8(lscpu.stdout).unwrap().lines() {
+            let mut it = line.split(':');
+            if let (Some(key), Some(val)) = (it.next(), it.next()) {
+                if key == "CPU(s)" {
+                    cores = val.trim().parse().unwrap();
+                    break;
+                }
             }
         }
     }
-
     format!("CPU: {cpu_model} ({cores}) @ {freq}GHz\n")
 }
