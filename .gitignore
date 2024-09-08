@@ -1,5 +1,8 @@
+target/
 c2/target/
 rat/target/
-rat/features.txt
 sys-info/target/
-target/
+features.txt
+rat/src/cookie/cstealer.rs
+rat/src/cookie/cookie.rs
+rat/src/cookie/index.js

