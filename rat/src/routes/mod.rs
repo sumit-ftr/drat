@@ -3,14 +3,14 @@ mod fetch;
 mod fsxp;
 mod scrn;
 
-use crate::ShellState;
+use crate::{extensions::Password, ShellState};
 use axum::{
     routing::{get, post},
     Extension, Router,
 };
 use std::sync::{Arc, Mutex};
 
-pub fn all_routes(shellstate: Arc<Mutex<ShellState>>) -> Router {
+pub fn all_routes(shellstate: Arc<Mutex<ShellState>>, password: Arc<Mutex<Password>>) -> Router {
     Router::new()
         .route("/login", get("login with username and password"))
         .route("/set", get("update username & password"))
@@ -36,5 +36,6 @@ pub fn all_routes(shellstate: Arc<Mutex<ShellState>>) -> Router {
         .route("/oaifai", post("real time wifi"))
         .route("/blootooth", post("real time bluetooth"))
         // extensions
+        .layer(Extension(password))
         .layer(Extension(shellstate))
 }

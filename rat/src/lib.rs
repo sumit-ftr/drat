@@ -11,9 +11,9 @@ use std::sync::{Arc, Mutex};
 use tokio;
 
 pub async fn run() {
-    startup::startup();
+    let p = Arc::new(Mutex::new(startup::startup()));
     let shellstate = Arc::new(Mutex::new(ShellState::new()));
-    let router = routes::all_routes(Arc::clone(&shellstate));
+    let router = routes::all_routes(Arc::clone(&shellstate), Arc::clone(&p));
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
         .await
