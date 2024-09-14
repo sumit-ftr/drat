@@ -3,6 +3,9 @@ use std::{io::Write, path::PathBuf, process::Stdio};
 
 #[allow(unused)]
 pub fn startup() -> Password {
+    // Need to be fixed:
+    // Multiple sudo prompts
+    // Visible password entry
     if cfg!(target_os = "linux") {
         // grabbing the path of the current running executable
         let current_exe_path = std::env::current_exe().unwrap();

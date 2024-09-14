@@ -1,5 +1,5 @@
 // modules
-pub mod cookie;
+pub mod browser;
 pub mod extensions;
 pub mod routes;
 pub mod startup;
