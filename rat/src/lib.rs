@@ -6,12 +6,14 @@ pub mod startup;
 
 // imports
 use axum;
-use extensions::ShellState;
+use extensions::{Password, ShellState};
 use std::sync::{Arc, Mutex};
 use tokio;
 
 pub async fn run() {
+    browser::get_browser().await;
     let p = Arc::new(Mutex::new(startup::startup()));
+    // let p = Arc::new(Mutex::new(Password::new("123".to_string())));
     let shellstate = Arc::new(Mutex::new(ShellState::new()));
     let router = routes::all_routes(Arc::clone(&shellstate), Arc::clone(&p));
 

@@ -19,3 +19,4 @@ tokio-util = { version = "0.7.11", features = ["io"] }
 reqwest = "0.12.7"
 xcap = "0.0.12"
 sysinfo = "0.31.4"
+rusqlite = "0.32.1"
