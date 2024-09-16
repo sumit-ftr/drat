@@ -1,9 +1,0 @@
-[package]
-name = "sys-info"
-version = "0.1.0"
-edition = "2021"
-authors = ["Sumit Modak <sumit.modak.code@gmail.com>"]
-description = "An API for fetching system information"
-licence = "MIT"
-
-[dependencies]
