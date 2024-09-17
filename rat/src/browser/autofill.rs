@@ -8,7 +8,6 @@ pub(super) struct AutoFillEntry {
     v: String,
 }
 
-// #[cfg]
 pub(super) async fn get_autofill(
     path: &mut PathBuf,
     profiles: &Vec<String>,
@@ -59,7 +58,7 @@ pub(super) async fn get_autofill(
             .unwrap();
 
         // Execute the command and collect the data
-        let data_iter = statement
+        let it = statement
             .query_map([], |row| {
                 Ok(AutoFillEntry {
                     k: row.get::<usize, String>(0).unwrap(),
@@ -70,11 +69,11 @@ pub(super) async fn get_autofill(
             })
             .unwrap();
 
-        let data = data_iter
-            .into_iter()
-            .map(|x| x.unwrap())
-            .collect::<Vec<AutoFillEntry>>();
-        result.push(data);
+        result.push(
+            it.into_iter()
+                .map(|x| x.unwrap())
+                .collect::<Vec<AutoFillEntry>>(),
+        );
 
         std::fs::remove_file(tempfile).unwrap();
         path.pop();
