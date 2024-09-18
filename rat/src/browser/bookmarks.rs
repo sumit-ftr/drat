@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 
-pub async fn get_bookmarks(
+pub(super) async fn get_bookmarks(
     path: &mut PathBuf,
     profiles: &Vec<String>,
-    tempfile: &PathBuf,
 ) -> std::io::Result<()> {
     for profile in profiles {
         path.push(profile);

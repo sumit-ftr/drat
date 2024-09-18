@@ -48,6 +48,9 @@ pub(super) async fn get_autofill(
                 .collect::<Vec<AutoFillEntry>>(),
         );
 
+        // getting credit cards
+        // statement = conn.prepare("SELECT * FROM credit_cards").unwrap();
+
         std::fs::remove_file(tempfile).unwrap();
         path.pop();
         path.pop();

