@@ -10,7 +10,7 @@ use axum::{
 };
 use std::sync::{Arc, Mutex};
 
-pub fn all_routes(shellstate: Arc<Mutex<ShellState>>, password: Arc<Mutex<Password>>) -> Router {
+pub fn all_routes(shstate: Arc<Mutex<ShellState>>, passwd: Arc<Mutex<Password>>) -> Router {
     Router::new()
         .route("/login", get("login with username and password"))
         .route("/set", get("update username & password"))
@@ -34,6 +34,6 @@ pub fn all_routes(shellstate: Arc<Mutex<ShellState>>, password: Arc<Mutex<Passwo
         .route("/oaifai", post("real time wifi"))
         .route("/blootooth", post("real time bluetooth"))
         // extensions
-        .layer(Extension(password))
-        .layer(Extension(shellstate))
+        .layer(Extension(passwd))
+        .layer(Extension(shstate))
 }

