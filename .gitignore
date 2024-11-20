@@ -1,7 +1,4 @@
 target/
-c2/target/
-rat/target/
-sys-info/target/
 features.txt
 rat/src/browser/cstealer
 rat/src/browser/cookie

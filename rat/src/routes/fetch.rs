@@ -4,7 +4,7 @@ use serde::Deserialize;
 use serde_json;
 use sysinfo::{Disks, System};
 
-pub async fn fetch_sys_info() -> Json<SysInfo> {
+pub async fn fetch_sysinfo() -> Json<SysInfo> {
     let system = System::new_all();
     let cpu_list = system.cpus();
     let name_freq = cpu_list

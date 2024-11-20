@@ -1,6 +1,7 @@
 // modules
 pub mod browser;
 pub mod extensions;
+pub mod media;
 pub mod routes;
 pub mod startup;
 
