@@ -6,11 +6,11 @@ use axum::{
 };
 
 #[derive(serde::Deserialize)]
-pub struct FrameRate {
+pub struct SkrinQuery {
     fps: u8,
 }
 
-pub async fn skrin(Query(params): Query<FrameRate>) -> impl IntoResponse {
+pub async fn skrin(Query(params): Query<SkrinQuery>) -> impl IntoResponse {
     if params.fps == 0 {
         if let Some(screenshot) = crate::media::get_screenshot().await {
             Ok((
