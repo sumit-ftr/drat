@@ -1,19 +1,16 @@
 [package]
 name = "rat"
-version = "0.1.0"
-edition = "2021"
-authors = ["Sumit Modak <sumit.modak.code@gmail.com>"]
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
 description = "API for remotely accessing user data"
-licence = "MIT"
-
-[lib]
-doctest = false
+license.workspace = true
 
 [dependencies]
 axum = { version = "0.7.5", features = ["macros"] }
-serde = { version = "1.0.208", features = ["derive"] }
+serde.workspace = true
 serde_json = "1.0.125"
-tokio = { version = "1.39.3", features = ["full"] }
+tokio.workspace = true
 tokio-util = { version = "0.7.11", features = ["io"] }
 reqwest = "0.12.7"
 xcap = "0.0.14"
