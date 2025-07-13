@@ -7,12 +7,12 @@ description = "API for remotely accessing user data"
 license.workspace = true
 
 [dependencies]
-axum = { version = "0.7.5", features = ["macros"] }
+axum = { version = "0.8.4", features = ["macros"] }
 serde.workspace = true
-serde_json = "1.0.125"
+serde_json = "1.0.140"
 tokio.workspace = true
-tokio-util = { version = "0.7.11", features = ["io"] }
-reqwest = "0.12.7"
-xcap = "0.0.14"
-sysinfo = "0.31.4"
-rusqlite = "0.32.1"
+reqwest = "0.12.22"
+xcap = "0.6.2"
+sysinfo = "0.36.0"
+tokio-util = { version = "0.7.15", features = ["io"] }
+rusqlite = "0.37.0"

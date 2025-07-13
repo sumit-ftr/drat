@@ -1,7 +1,7 @@
 use axum::{
     body::Body,
     extract::Query,
-    http::{header, StatusCode},
+    http::{StatusCode, header},
     response::IntoResponse,
 };
 

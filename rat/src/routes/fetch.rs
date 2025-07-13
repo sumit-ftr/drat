@@ -41,9 +41,9 @@ pub async fn fetch_sysinfo() -> Json<SysInfo> {
             free: formatted_memory(system.free_memory()),
         },
         cpu: CpuInfo {
-            arch: System::cpu_arch().unwrap(),
+            arch: System::cpu_arch(),
             usage: system.global_cpu_usage(),
-            cores: system.physical_core_count().unwrap(),
+            cores: System::physical_core_count().unwrap(),
             cpus: name_freq.len(),
             name_freq,
             vendor_id: cpu_list.iter().next().unwrap().vendor_id().to_string(),

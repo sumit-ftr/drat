@@ -1,9 +1,11 @@
-use axum::body::Body;
+use axum::{
+    body::Body,
+    http::{HeaderMap, header},
+};
 use std::collections::VecDeque;
-use tokio_util::io::ReaderStream;
 use xcap::{
-    image::{ImageBuffer, Rgba},
     Monitor,
+    image::{ImageBuffer, Rgba},
 };
 
 pub async fn get_screenshot() -> Option<Body> {
@@ -12,10 +14,9 @@ pub async fn get_screenshot() -> Option<Body> {
 
     // capturing screenshot and converting into body
     let image = monitor.capture_image().unwrap();
-    let buf = image.as_raw();
-    let body = Body::from(buf);
+    let body = Body::from(image.into_raw());
 
-    Ok(([(header::CONTENT_TYPE, "image/png")], body))
+    Some(body)
 }
 
 pub struct ScreenVars {
